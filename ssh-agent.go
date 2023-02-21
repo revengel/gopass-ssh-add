@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -34,7 +37,12 @@ func (sa sshAgent) list() (o []string, err error) {
 func (sa *sshAgent) add(privateKeyB []byte, password, comment string, lifetime uint32) (err error) {
 	var privateKey interface{}
 
-	if len(password) > 0 {
+	decodedPem, _ := pem.Decode(privateKeyB)
+
+	if x509.IsEncryptedPEMBlock(decodedPem) {
+		if len(password) == 0 {
+			return errors.New("private ssh-key is encrypted but provided password is empty")
+		}
 		privateKey, err = ssh.ParseRawPrivateKeyWithPassphrase(privateKeyB, []byte(password))
 	} else {
 		privateKey, err = ssh.ParseRawPrivateKey(privateKeyB)
