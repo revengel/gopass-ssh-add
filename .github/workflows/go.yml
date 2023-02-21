@@ -31,7 +31,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v4.1.0
         with:
           version: latest
-          args: release --clean
+          args: release --clean --auto-snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           GOPATH: /home/runner/go
