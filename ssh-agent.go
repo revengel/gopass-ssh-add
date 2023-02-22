@@ -38,16 +38,9 @@ func (sa *sshAgent) add(privateKeyB []byte, password, comment string, lifetime u
 	var privateKey interface{}
 
 	decodedPem, _ := pem.Decode(privateKeyB)
+	keyIsEncrypted := x509.IsEncryptedPEMBlock(decodedPem)
 
-	if x509.IsEncryptedPEMBlock(decodedPem) {
-		if len(password) == 0 {
-			return errors.New("private ssh-key is encrypted but provided password is empty")
-		}
-		privateKey, err = ssh.ParseRawPrivateKeyWithPassphrase(privateKeyB, []byte(password))
-	} else {
-		privateKey, err = ssh.ParseRawPrivateKey(privateKeyB)
-	}
-
+	privateKey, err = sa.decryptPrivateSSHKey(privateKeyB, password, keyIsEncrypted)
 	if err != nil {
 		return
 	}
@@ -63,6 +56,24 @@ func (sa *sshAgent) add(privateKeyB []byte, password, comment string, lifetime u
 	}
 
 	return
+}
+
+func (sa sshAgent) decryptPrivateSSHKey(data []byte, password string, encrypted bool) (o interface{}, err error) {
+	if !encrypted {
+		o, err = ssh.ParseRawPrivateKey(data)
+		if err != nil {
+			if _, ok := err.(*ssh.PassphraseMissingError); ok {
+				return sa.decryptPrivateSSHKey(data, password, true)
+			}
+		}
+		return o, err
+	}
+
+	if len(password) == 0 {
+		return nil, errors.New("private ssh-key is encrypted but provided password is empty")
+	}
+
+	return ssh.ParseRawPrivateKeyWithPassphrase(data, []byte(password))
 }
 
 func (sa *sshAgent) delete(publicKeyB []byte) (err error) {
