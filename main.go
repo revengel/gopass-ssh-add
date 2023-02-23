@@ -109,9 +109,9 @@ func main() {
 	app.Commands = []*cli.Command{
 		// working with ssh-agent
 		{
-			Name:        "ssh-agent",
+			Name:        "agent",
 			Description: "manage with ssh-agent",
-			Aliases:     []string{"ssh", "ssh-add"},
+			Aliases:     []string{},
 			Hidden:      false,
 			Subcommands: []*cli.Command{
 				{
@@ -176,6 +176,17 @@ func main() {
 					Aliases:      []string{"remove", "del", "rm"},
 					BashComplete: gc.PathAutocomplete,
 				},
+				// run ssh-keygen
+				{
+					Name:         "generate",
+					Description:  "generate ssh-key and save it",
+					Hidden:       false,
+					Action:       gc.SSHKeygen,
+					Before:       gc.Before,
+					Aliases:      []string{"keygen", "gen", "ssh-keygen"},
+					BashComplete: gc.PathAutocomplete,
+					Flags:        append(appSSHKeygenFlags, appPasswordFlags...),
+				},
 				// password section
 				{
 					Name:        "password",
@@ -231,17 +242,6 @@ func main() {
 					Hidden:      false,
 					Aliases:     []string{"ssh-key"},
 					Subcommands: []*cli.Command{
-						// run ssh-keygen
-						{
-							Name:         "keygen",
-							Description:  "generate ssh-key and save it",
-							Hidden:       false,
-							Action:       gc.SSHKeygen,
-							Before:       gc.Before,
-							Aliases:      []string{"generate", "gen"},
-							BashComplete: gc.PathAutocomplete,
-							Flags:        append(appSSHKeygenFlags, appPasswordFlags...),
-						},
 						// delete ssh-key (private and puplic) from secret
 						{
 							Name:         "delete",
