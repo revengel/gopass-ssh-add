@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -428,8 +429,22 @@ func (s *gc) ShowSSHPublicKey(c *cli.Context) error {
 		return err
 	}
 
+	pubKey = bytes.SplitN(pubKey, []byte{'\n'}, 2)[0]
+	var pubKeySpaceParts = bytes.SplitN(pubKey, []byte{' '}, 3)
+	if len(pubKeySpaceParts) == 3 && bytes.Equal(pubKeySpaceParts[2], []byte("noname")) {
+		pubKeySpaceParts = pubKeySpaceParts[0:2]
+	}
+
+	if len(pubKeySpaceParts) < 3 {
+		var comment = getSSHKeyComment(s.key)
+		pubKeySpaceParts = append(pubKeySpaceParts, []byte(comment))
+		pubKey = bytes.Join(pubKeySpaceParts, []byte{' '})
+	}
+
+	var pubKeyStr = string(pubKey)
+
 	if !clip {
-		fmt.Println(string(pubKey))
+		fmt.Println(pubKeyStr)
 		return nil
 	}
 
