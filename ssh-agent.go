@@ -4,7 +4,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-	"fmt"
 	"net"
 	"os"
 
@@ -48,7 +47,7 @@ func (sa *sshAgent) add(privateKeyB []byte, password, comment string, lifetime u
 	key := agent.AddedKey{
 		PrivateKey:   privateKey,
 		LifetimeSecs: lifetime,
-		Comment:      fmt.Sprintf("%s: %s", appName, comment),
+		Comment:      getSSHKeyComment(comment),
 	}
 	err = sa.agent.Add(key)
 	if err != nil {

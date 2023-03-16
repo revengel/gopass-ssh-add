@@ -90,3 +90,7 @@ func askForConfirmation(s string, ss ...any) bool {
 		panic(err)
 	}
 }
+
+func getSSHKeyComment(key string) string {
+	return fmt.Sprintf("%s:%s", "gssh", key)
+}
