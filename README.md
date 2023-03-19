@@ -47,11 +47,9 @@ manage ssh-agent
 
 add ssh-key to ssh-agent
 
-    Add ssh-key to agent forever:
-    `gopass-ssh-add --store=ssh-keys agent add path/to/ssh/key`
+    `gopass-ssh-add --store=ssh-keys agent add path/to/ssh/key` # Add ssh-key to agent forever
     
-    Add ssh-key to agent for 5 minutes:
-    `gopass-ssh-add --store=ssh-keys agent add --time=300 path/to/ssh/key`
+    `gopass-ssh-add --store=ssh-keys agent add --time=300 path/to/ssh/key` # Add ssh-key to agent for 5 minutes
 
 **--lifetime, --time, -t**="": set a maximum lifetime when adding identities to an agent. (default: 0)
 
